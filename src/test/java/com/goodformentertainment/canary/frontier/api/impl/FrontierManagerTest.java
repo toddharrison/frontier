@@ -17,6 +17,7 @@ import org.junit.Test;
 
 import com.goodformentertainment.canary.frontier.FrontierConfig;
 import com.goodformentertainment.canary.frontier.FrontierPlugin;
+import com.goodformentertainment.canary.frontier.RegionUtil;
 
 public class FrontierManagerTest extends EasyMockSupport {
 	private FrontierConfig mockConfig;
@@ -88,12 +89,50 @@ public class FrontierManagerTest extends EasyMockSupport {
 	
 	@Test
 	public void testSetBlockBounds() {
-		mockConfig.setRegionBounds(mockWorld, -2, 1, -1, 0);
+		mockConfig.setRegionBounds(mockWorld, -2, -1, 1, 0);
 		
 		replayAll();
 		
 		manager.setBlockBounds(mockWorld, new Point(-513, -1), new Point(512, 50));
 		
 		verifyAll();
+	}
+	
+	@Test
+	public void test() {
+		mockConfig.setRegionBounds(mockWorld, -1, -1, 3, 4);
+		
+		replayAll();
+		
+		manager.setBlockBounds(mockWorld, new Point(-512, -512), new Point(2045, 2555));
+		
+		verifyAll();
+	}
+	
+	@Test
+	public void testMaths() {
+		assertEquals(-2, RegionUtil.fromBlockToRegion(-513));
+		assertEquals(-1, RegionUtil.fromBlockToRegion(-512));
+		assertEquals(-1, RegionUtil.fromBlockToRegion(-1));
+		assertEquals(0, RegionUtil.fromBlockToRegion(0));
+		assertEquals(0, RegionUtil.fromBlockToRegion(1));
+		assertEquals(0, RegionUtil.fromBlockToRegion(511));
+		assertEquals(1, RegionUtil.fromBlockToRegion(512));
+		assertEquals(1, RegionUtil.fromBlockToRegion(513));
+		assertEquals(1, RegionUtil.fromBlockToRegion(1023));
+		assertEquals(2, RegionUtil.fromBlockToRegion(1024));
+		
+		assertEquals(-1024, RegionUtil.fromRegionToBlock(-2, true));
+		assertEquals(-512, RegionUtil.fromRegionToBlock(-1, true));
+		assertEquals(0, RegionUtil.fromRegionToBlock(0, true));
+		assertEquals(512, RegionUtil.fromRegionToBlock(1, true));
+		assertEquals(1024, RegionUtil.fromRegionToBlock(2, true));
+		
+		assertEquals(-1025, RegionUtil.fromRegionToBlock(-3, false));
+		assertEquals(-513, RegionUtil.fromRegionToBlock(-2, false));
+		assertEquals(-1, RegionUtil.fromRegionToBlock(-1, false));
+		assertEquals(511, RegionUtil.fromRegionToBlock(0, false));
+		assertEquals(1023, RegionUtil.fromRegionToBlock(1, false));
+		assertEquals(1535, RegionUtil.fromRegionToBlock(2, false));
 	}
 }

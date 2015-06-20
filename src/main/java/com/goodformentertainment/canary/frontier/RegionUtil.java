@@ -10,35 +10,41 @@ public final class RegionUtil {
 	// Region 0:0 = [0:0, 512:512)
 	// Region -1:-1 = [-512:-512, 0:0)
 	
-	public static Rectangle pointsToRectangle(final int minX, final int maxX, final int minZ,
+	public static Rectangle pointsToRectangle(final int minX, final int minZ, final int maxX,
 			final int maxZ) {
 		return new Rectangle(minX, minZ, maxX - minX, maxZ - minZ);
 	}
 	
 	public static int[] rectangleToPoints(final Rectangle bounds) {
 		return new int[] {
-				bounds.x, bounds.x + bounds.width, bounds.y, bounds.y + bounds.height
-		};
-	}
-	
-	public static int[] pointsToArray(final int xMin, final int xMax, final int zMin, final int zMax) {
-		return new int[] {
-				xMin, zMin, xMax - xMin, zMax - zMin
+				bounds.x, bounds.y, bounds.x + bounds.width, bounds.y + bounds.height
 		};
 	}
 	
 	public static Rectangle regionToBlockBounds(final Rectangle regionBounds) {
 		Rectangle blockBounds = null;
 		if (regionBounds != null) {
-			final int[] regionPoints = RegionUtil.rectangleToPoints(regionBounds);
+			final int[] regionPoints = rectangleToPoints(regionBounds);
 			
-			final int minX = regionPoints[0] * BLOCKS_PER_REGION;
-			final int maxX = (regionPoints[1] + 1) * BLOCKS_PER_REGION - 1;
-			final int minZ = regionPoints[2] * BLOCKS_PER_REGION;
-			final int maxZ = (regionPoints[3] + 1) * BLOCKS_PER_REGION - 1;
+			final int minX = fromRegionToBlock(regionPoints[0], true);
+			final int minZ = fromRegionToBlock(regionPoints[1], true);
+			final int maxX = fromRegionToBlock(regionPoints[2], false);
+			final int maxZ = fromRegionToBlock(regionPoints[3], false);
 			
-			blockBounds = RegionUtil.pointsToRectangle(minX, maxX, minZ, maxZ);
+			blockBounds = pointsToRectangle(minX, minZ, maxX, maxZ);
 		}
 		return blockBounds;
+	}
+	
+	public static int fromBlockToRegion(final int blockLoc) {
+		return (int) Math.floor(blockLoc / (double) BLOCKS_PER_REGION);
+	}
+	
+	public static int fromRegionToBlock(final int regionLoc, final boolean roundDown) {
+		if (roundDown) {
+			return regionLoc * BLOCKS_PER_REGION;
+		} else {
+			return (regionLoc + 1) * BLOCKS_PER_REGION - 1;
+		}
 	}
 }

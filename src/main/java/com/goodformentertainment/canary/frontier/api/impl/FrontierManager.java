@@ -32,27 +32,17 @@ public class FrontierManager implements IFrontierManager {
 	
 	@Override
 	public Rectangle setBlockBounds(final World world, final Point minPoint, final Point maxPoint) {
-		int minX = (int) Math.floor(minPoint.x / RegionUtil.BLOCKS_PER_REGION);
-		int maxX = (int) Math.ceil(maxPoint.x / RegionUtil.BLOCKS_PER_REGION);
-		int minZ = (int) Math.floor(minPoint.y / RegionUtil.BLOCKS_PER_REGION);
-		int maxZ = (int) Math.ceil(maxPoint.y / RegionUtil.BLOCKS_PER_REGION);
+		final int regionMinX = RegionUtil.fromBlockToRegion(minPoint.x);
+		final int regionMinZ = RegionUtil.fromBlockToRegion(minPoint.y);
+		final int regionMaxX = RegionUtil.fromBlockToRegion(maxPoint.x);
+		final int regionMaxZ = RegionUtil.fromBlockToRegion(maxPoint.y);
+		config.setRegionBounds(world, regionMinX, regionMinZ, regionMaxX, regionMaxZ);
 		
-		if (minPoint.x < 0) {
-			minX--;
-		}
-		if (minPoint.y < 0) {
-			minZ--;
-		}
-		if (maxPoint.x < 0) {
-			maxX--;
-		}
-		if (maxPoint.y < 0) {
-			maxZ--;
-		}
-		
-		config.setRegionBounds(world, minX, maxX, minZ, maxZ);
-		
-		return RegionUtil.regionToBlockBounds(RegionUtil.pointsToRectangle(minX, maxX, minZ, maxZ));
+		final int blockMinX = RegionUtil.fromRegionToBlock(regionMinX, true);
+		final int blockMinZ = RegionUtil.fromRegionToBlock(regionMinZ, true);
+		final int blockMaxX = RegionUtil.fromRegionToBlock(regionMaxX, false);
+		final int blockMaxZ = RegionUtil.fromRegionToBlock(regionMaxZ, false);
+		return RegionUtil.pointsToRectangle(blockMinX, blockMinZ, blockMaxX, blockMaxZ);
 	}
 	
 	@Override

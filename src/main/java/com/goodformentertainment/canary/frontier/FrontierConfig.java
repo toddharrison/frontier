@@ -103,10 +103,12 @@ public class FrontierConfig {
 		cfg.save();
 	}
 	
-	public void setRegionBounds(final World world, final int xMin, final int xMax, final int zMin,
+	public void setRegionBounds(final World world, final int xMin, final int zMin, final int xMax,
 			final int zMax) {
 		addManagedWorld(world);
-		final int points[] = RegionUtil.pointsToArray(xMin, xMax, zMin, zMax);
+		final int points[] = new int[] {
+				xMin, zMin, xMax, zMax
+		};
 		cfg.setIntArray(WORLD_FRONTIER + world.getFqName(), points);
 		cfg.save();
 	}
