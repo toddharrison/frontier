@@ -31,7 +31,7 @@ public class FrontierManager implements IFrontierManager {
 	}
 	
 	@Override
-	public void setBlockBounds(final World world, final Point minPoint, final Point maxPoint) {
+	public Rectangle setBlockBounds(final World world, final Point minPoint, final Point maxPoint) {
 		int minX = (int) Math.floor(minPoint.x / RegionUtil.BLOCKS_PER_REGION);
 		int maxX = (int) Math.ceil(maxPoint.x / RegionUtil.BLOCKS_PER_REGION);
 		int minZ = (int) Math.floor(minPoint.y / RegionUtil.BLOCKS_PER_REGION);
@@ -51,6 +51,8 @@ public class FrontierManager implements IFrontierManager {
 		}
 		
 		config.setRegionBounds(world, minX, maxX, minZ, maxZ);
+		
+		return RegionUtil.regionToBlockBounds(RegionUtil.pointsToRectangle(minX, maxX, minZ, maxZ));
 	}
 	
 	@Override
@@ -84,7 +86,7 @@ public class FrontierManager implements IFrontierManager {
 		for (final String worldFqName : config.getManagedWorldNames()) {
 			if (loadedWorldNames.contains(worldFqName)) {
 				FrontierPlugin.LOG.warn("Unable to reset wilderness in " + worldFqName);
-			} else {
+			} else if (worldFqName != null && !worldFqName.isEmpty()) {
 				final String worldName = worldFqName.substring(0, worldFqName.indexOf("_"));
 				
 				try {
@@ -92,13 +94,17 @@ public class FrontierManager implements IFrontierManager {
 					if (worldsDir.exists()) {
 						final File regionDir = new File(worldsDir, worldName + "/" + worldFqName + "/region");
 						if (regionDir.exists()) {
+							
+							final Rectangle regionBounds = config.getRegionBounds(worldFqName);
+							
 							final Pattern pattern = Pattern.compile("^r\\.(-?\\d+)\\.(-?\\d+)\\.mca$");
 							for (final String filename : regionDir.list()) {
 								final Matcher matcher = pattern.matcher(filename);
 								if (matcher.matches()) {
 									final int x = Integer.parseInt(matcher.group(1));
 									final int z = Integer.parseInt(matcher.group(2));
-									if (x >= 0 && z >= 0) {
+									if (regionBounds.x > x || regionBounds.x + regionBounds.width < x
+											|| regionBounds.y > z || regionBounds.y + regionBounds.height < z) {
 										final File regionFile = new File(regionDir, filename);
 										if (regionFile.delete()) {
 											FrontierPlugin.LOG.info("Deleted " + filename + " for " + worldFqName);

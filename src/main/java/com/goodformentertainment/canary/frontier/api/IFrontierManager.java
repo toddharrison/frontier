@@ -9,7 +9,7 @@ import net.canarymod.api.world.position.Location;
 public interface IFrontierManager {
 	Rectangle getBlockBounds(World world);
 	
-	void setBlockBounds(World world, Point minPoint, Point maxPoint);
+	Rectangle setBlockBounds(World world, Point minPoint, Point maxPoint);
 	
 	Rectangle getRegionBounds(World world);
 	

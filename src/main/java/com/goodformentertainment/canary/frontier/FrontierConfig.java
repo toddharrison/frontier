@@ -1,6 +1,7 @@
 package com.goodformentertainment.canary.frontier;
 
 import java.awt.Rectangle;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
@@ -23,7 +24,7 @@ public class FrontierConfig {
 	
 	public Collection<String> getManagedWorldNames() {
 		final Set<String> worlds = new HashSet<String>();
-		for (final String world : cfg.getStringArray(MANAGED_WORLDS, new String[0])) {
+		for (final String world : cfg.getStringArray(MANAGED_WORLDS)) {
 			worlds.add(world);
 		}
 		return worlds;
@@ -34,7 +35,7 @@ public class FrontierConfig {
 		if (!Arrays.asList(worldNames).contains(world.getFqName())) {
 			final String[] newNames = new String[worldNames.length + 1];
 			System.arraycopy(worldNames, 0, newNames, 0, worldNames.length);
-			newNames[worldNames.length + 1] = world.getFqName();
+			newNames[worldNames.length] = world.getFqName();
 			
 			cfg.setStringArray(MANAGED_WORLDS, newNames);
 			cfg.save();
@@ -44,7 +45,7 @@ public class FrontierConfig {
 	public boolean removeManagedWorld(final World world) {
 		boolean removed = false;
 		final String[] worldNames = cfg.getStringArray(MANAGED_WORLDS);
-		final List<String> nameList = Arrays.asList(worldNames);
+		final List<String> nameList = new ArrayList<String>(Arrays.asList(worldNames));
 		if (nameList.remove(world.getFqName())) {
 			final String[] newNames = nameList.toArray(new String[nameList.size()]);
 			cfg.setStringArray(MANAGED_WORLDS, newNames);
@@ -56,16 +57,40 @@ public class FrontierConfig {
 	}
 	
 	public Rectangle getRegionBounds(final World world) {
-		final int[] points = cfg.getIntArray(WORLD_FRONTIER + world.getFqName(), (int[]) null);
-		
 		Rectangle bounds = null;
-		if (points != null && points.length == 4) {
-			final int xMin = points[0];
-			final int xMax = points[1];
-			final int zMin = points[2];
-			final int zMax = points[3];
+		
+		final String key = WORLD_FRONTIER + world.getFqName();
+		if (cfg.containsKey(key)) {
+			final int[] points = cfg.getIntArray(key);
 			
-			bounds = RegionUtil.pointsToRectangle(xMin, zMin, xMax - xMin, zMax - zMin);
+			if (points != null && points.length == 4) {
+				final int xMin = points[0];
+				final int xMax = points[1];
+				final int zMin = points[2];
+				final int zMax = points[3];
+				
+				bounds = RegionUtil.pointsToRectangle(xMin, zMin, xMax - xMin, zMax - zMin);
+			}
+		}
+		
+		return bounds;
+	}
+	
+	public Rectangle getRegionBounds(final String worldFqName) {
+		Rectangle bounds = null;
+		
+		final String key = WORLD_FRONTIER + worldFqName;
+		if (cfg.containsKey(key)) {
+			final int[] points = cfg.getIntArray(key);
+			
+			if (points != null && points.length == 4) {
+				final int xMin = points[0];
+				final int xMax = points[1];
+				final int zMin = points[2];
+				final int zMax = points[3];
+				
+				bounds = RegionUtil.pointsToRectangle(xMin, zMin, xMax - xMin, zMax - zMin);
+			}
 		}
 		
 		return bounds;

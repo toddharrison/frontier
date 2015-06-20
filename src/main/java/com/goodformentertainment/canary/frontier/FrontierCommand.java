@@ -76,10 +76,13 @@ public class FrontierCommand implements CommandListener {
 					
 					final Point minPoint = new Point(minX, minZ);
 					final Point maxPoint = new Point(maxX, maxZ);
-					manager.setBlockBounds(world, minPoint, maxPoint);
+					final Rectangle regionBounds = manager.setBlockBounds(world, minPoint, maxPoint);
+					
+					final int[] points = RegionUtil.rectangleToPoints(regionBounds);
+					
 					caller.asPlayer().message("Set the frontier to ");
-					player.message("Frontier: x = [" + minPoint.x + ", " + maxPoint.x + "] and y = ["
-							+ minPoint.y + ", " + maxPoint.y + "]");
+					player.message("Frontier: x = [" + points[0] + ", " + points[1] + "] and y = ["
+							+ points[2] + ", " + points[3] + "]");
 				} else {
 					player.message("Usage: /frontier set <minX maxX minZ maxZ>");
 				}

@@ -1,5 +1,8 @@
 package com.goodformentertainment.canary.frontier;
 
+import java.io.File;
+import java.io.IOException;
+
 import net.canarymod.Canary;
 import net.canarymod.commandsys.CommandDependencyException;
 import net.canarymod.logger.Logman;
@@ -33,6 +36,12 @@ public class FrontierPlugin extends Plugin {
 	
 	public FrontierPlugin() {
 		FrontierPlugin.LOG = getLogman();
+		
+		try {
+			JarUtil.exportResource(this, "Frontier.cfg", new File("config/Frontier"));
+		} catch (final IOException e) {
+			LOG.warn("Failed to create the default configuration file.", e);
+		}
 	}
 	
 	@Override
