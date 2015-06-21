@@ -1,7 +1,5 @@
 package com.goodformentertainment.canary.frontier.api.impl;
 
-import java.awt.Point;
-import java.awt.Rectangle;
 import java.io.File;
 import java.util.Arrays;
 import java.util.Collection;
@@ -13,8 +11,10 @@ import net.canarymod.api.world.World;
 import net.canarymod.api.world.WorldManager;
 import net.canarymod.api.world.position.Location;
 
+import com.goodformentertainment.canary.frontier.Area;
 import com.goodformentertainment.canary.frontier.FrontierConfig;
 import com.goodformentertainment.canary.frontier.FrontierPlugin;
+import com.goodformentertainment.canary.frontier.Point;
 import com.goodformentertainment.canary.frontier.RegionUtil;
 import com.goodformentertainment.canary.frontier.api.IFrontierManager;
 
@@ -26,34 +26,33 @@ public class FrontierManager implements IFrontierManager {
 	}
 	
 	@Override
-	public Rectangle getBlockBounds(final World world) {
+	public Area getBlockBounds(final World world) {
 		return RegionUtil.regionToBlockBounds(config.getRegionBounds(world));
 	}
 	
 	@Override
-	public Rectangle setBlockBounds(final World world, final Point minPoint, final Point maxPoint) {
+	public Area setBlockBounds(final World world, final Point minPoint, final Point maxPoint) {
 		final int regionMinX = RegionUtil.fromBlockToRegion(minPoint.x);
-		final int regionMinZ = RegionUtil.fromBlockToRegion(minPoint.y);
+		final int regionMinZ = RegionUtil.fromBlockToRegion(minPoint.z);
 		final int regionMaxX = RegionUtil.fromBlockToRegion(maxPoint.x);
-		final int regionMaxZ = RegionUtil.fromBlockToRegion(maxPoint.y);
+		final int regionMaxZ = RegionUtil.fromBlockToRegion(maxPoint.z);
 		config.setRegionBounds(world, regionMinX, regionMinZ, regionMaxX, regionMaxZ);
 		
 		final int blockMinX = RegionUtil.fromRegionToBlock(regionMinX, true);
 		final int blockMinZ = RegionUtil.fromRegionToBlock(regionMinZ, true);
 		final int blockMaxX = RegionUtil.fromRegionToBlock(regionMaxX, false);
 		final int blockMaxZ = RegionUtil.fromRegionToBlock(regionMaxZ, false);
-		return RegionUtil.pointsToRectangle(blockMinX, blockMinZ, blockMaxX, blockMaxZ);
+		return RegionUtil.pointsToArea(blockMinX, blockMinZ, blockMaxX, blockMaxZ);
 	}
 	
 	@Override
-	public Rectangle getRegionBounds(final World world) {
+	public Area getRegionBounds(final World world) {
 		return config.getRegionBounds(world);
 	}
 	
 	@Override
 	public void setRegionBounds(final World world, final Point minPoint, final Point maxPoint) {
-		final Rectangle bounds = new Rectangle(minPoint);
-		bounds.add(maxPoint);
+		final Area bounds = new Area(minPoint, maxPoint);
 		config.setRegionBounds(world, bounds);
 	}
 	
@@ -64,8 +63,8 @@ public class FrontierManager implements IFrontierManager {
 	
 	@Override
 	public boolean inWilderness(final Location location) {
-		final Rectangle regionBounds = config.getRegionBounds(location.getWorld());
-		final Rectangle blockBounds = RegionUtil.regionToBlockBounds(regionBounds);
+		final Area regionBounds = config.getRegionBounds(location.getWorld());
+		final Area blockBounds = RegionUtil.regionToBlockBounds(regionBounds);
 		return !blockBounds.contains(new Point(location.getBlockX(), location.getBlockZ()));
 	}
 	
@@ -85,7 +84,7 @@ public class FrontierManager implements IFrontierManager {
 						final File regionDir = new File(worldsDir, worldName + "/" + worldFqName + "/region");
 						if (regionDir.exists()) {
 							
-							final Rectangle regionBounds = config.getRegionBounds(worldFqName);
+							final Area regionBounds = config.getRegionBounds(worldFqName);
 							
 							final Pattern pattern = Pattern.compile("^r\\.(-?\\d+)\\.(-?\\d+)\\.mca$");
 							for (final String filename : regionDir.list()) {
@@ -93,8 +92,8 @@ public class FrontierManager implements IFrontierManager {
 								if (matcher.matches()) {
 									final int x = Integer.parseInt(matcher.group(1));
 									final int z = Integer.parseInt(matcher.group(2));
-									if (regionBounds.x > x || regionBounds.x + regionBounds.width < x
-											|| regionBounds.y > z || regionBounds.y + regionBounds.height < z) {
+									if (regionBounds.min.x > x || regionBounds.max.x < x || regionBounds.min.z > z
+											|| regionBounds.max.z < z) {
 										final File regionFile = new File(regionDir, filename);
 										if (regionFile.delete()) {
 											FrontierPlugin.LOG.info("Deleted " + filename + " for " + worldFqName);

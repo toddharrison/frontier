@@ -1,17 +1,17 @@
 package com.goodformentertainment.canary.frontier.api;
 
-import java.awt.Point;
-import java.awt.Rectangle;
-
 import net.canarymod.api.world.World;
 import net.canarymod.api.world.position.Location;
 
+import com.goodformentertainment.canary.frontier.Area;
+import com.goodformentertainment.canary.frontier.Point;
+
 public interface IFrontierManager {
-	Rectangle getBlockBounds(World world);
+	Area getBlockBounds(World world);
 	
-	Rectangle setBlockBounds(World world, Point minPoint, Point maxPoint);
+	Area setBlockBounds(World world, Point minPoint, Point maxPoint);
 	
-	Rectangle getRegionBounds(World world);
+	Area getRegionBounds(World world);
 	
 	void setRegionBounds(World world, Point minPoint, Point maxPoint);
 	

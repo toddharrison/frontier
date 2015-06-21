@@ -1,8 +1,5 @@
 package com.goodformentertainment.canary.frontier;
 
-import java.awt.Point;
-import java.awt.Rectangle;
-
 import net.canarymod.api.entity.living.humanoid.Player;
 import net.canarymod.api.world.World;
 import net.canarymod.chat.MessageReceiver;
@@ -40,14 +37,14 @@ public class FrontierCommand implements CommandListener {
 		if (caller instanceof Player) {
 			final Player player = caller.asPlayer();
 			final World world = player.getWorld();
-			final Rectangle bounds = manager.getBlockBounds(world);
+			final Area bounds = manager.getBlockBounds(world);
 			if (bounds == null) {
 				player.message("There is no frontier in this world");
 			} else {
-				final int[] points = RegionUtil.rectangleToPoints(bounds);
+				final int[] points = RegionUtil.areaToPointsArray(bounds);
 				// bounds in interval notation
-				player.message("Frontier: x = [" + points[0] + ", " + points[1] + "] and y = [" + points[2]
-						+ ", " + points[3] + "]");
+				player.message("Frontier: min = [" + points[0] + ", " + points[1] + "] and max = ["
+						+ points[2] + ", " + points[3] + "]");
 				if (manager.inWilderness(player.getLocation())) {
 					player.message("You are currently in the wilderness");
 				} else {
@@ -76,12 +73,12 @@ public class FrontierCommand implements CommandListener {
 					
 					final Point minPoint = new Point(minX, minZ);
 					final Point maxPoint = new Point(maxX, maxZ);
-					final Rectangle regionBounds = manager.setBlockBounds(world, minPoint, maxPoint);
+					final Area regionBounds = manager.setBlockBounds(world, minPoint, maxPoint);
 					
-					final int[] points = RegionUtil.rectangleToPoints(regionBounds);
+					final int[] points = RegionUtil.areaToPointsArray(regionBounds);
 					
 					player.message("Set the frontier to ");
-					player.message("Frontier: x = [" + points[0] + ", " + points[1] + "] and y = ["
+					player.message("Frontier: min = [" + points[0] + ", " + points[1] + "] and max = ["
 							+ points[2] + ", " + points[3] + "]");
 				} else {
 					player.message("Usage: /frontier set <minX minZ maxX maxZ>");

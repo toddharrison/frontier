@@ -1,6 +1,5 @@
 package com.goodformentertainment.canary.frontier;
 
-import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -56,8 +55,8 @@ public class FrontierConfig {
 		return removed;
 	}
 	
-	public Rectangle getRegionBounds(final World world) {
-		Rectangle bounds = null;
+	public Area getRegionBounds(final World world) {
+		Area bounds = null;
 		
 		final String key = WORLD_FRONTIER + world.getFqName();
 		if (cfg.containsKey(key)) {
@@ -65,19 +64,19 @@ public class FrontierConfig {
 			
 			if (points != null && points.length == 4) {
 				final int xMin = points[0];
-				final int xMax = points[1];
-				final int zMin = points[2];
+				final int zMin = points[1];
+				final int xMax = points[2];
 				final int zMax = points[3];
 				
-				bounds = RegionUtil.pointsToRectangle(xMin, zMin, xMax - xMin, zMax - zMin);
+				bounds = RegionUtil.pointsToArea(xMin, zMin, xMax, zMax);
 			}
 		}
 		
 		return bounds;
 	}
 	
-	public Rectangle getRegionBounds(final String worldFqName) {
-		Rectangle bounds = null;
+	public Area getRegionBounds(final String worldFqName) {
+		Area bounds = null;
 		
 		final String key = WORLD_FRONTIER + worldFqName;
 		if (cfg.containsKey(key)) {
@@ -85,30 +84,25 @@ public class FrontierConfig {
 			
 			if (points != null && points.length == 4) {
 				final int xMin = points[0];
-				final int xMax = points[1];
-				final int zMin = points[2];
+				final int zMin = points[1];
+				final int xMax = points[2];
 				final int zMax = points[3];
 				
-				bounds = RegionUtil.pointsToRectangle(xMin, zMin, xMax - xMin, zMax - zMin);
+				bounds = RegionUtil.pointsToArea(xMin, zMin, xMax, zMax);
 			}
 		}
 		
 		return bounds;
 	}
 	
-	public void setRegionBounds(final World world, final Rectangle bounds) {
-		addManagedWorld(world);
-		final int points[] = RegionUtil.rectangleToPoints(bounds);
-		cfg.setIntArray(WORLD_FRONTIER + world.getFqName(), points);
-		cfg.save();
-	}
-	
 	public void setRegionBounds(final World world, final int xMin, final int zMin, final int xMax,
 			final int zMax) {
+		setRegionBounds(world, new Area(xMin, zMin, xMax, zMax));
+	}
+	
+	public void setRegionBounds(final World world, final Area bounds) {
 		addManagedWorld(world);
-		final int points[] = new int[] {
-				xMin, zMin, xMax, zMax
-		};
+		final int points[] = RegionUtil.areaToPointsArray(bounds);
 		cfg.setIntArray(WORLD_FRONTIER + world.getFqName(), points);
 		cfg.save();
 	}

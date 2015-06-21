@@ -2,10 +2,6 @@ package com.goodformentertainment.canary.frontier.api.impl;
 
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
-
-import java.awt.Point;
-import java.awt.Rectangle;
-
 import net.canarymod.api.world.DimensionType;
 import net.canarymod.api.world.World;
 import net.canarymod.api.world.position.Location;
@@ -15,8 +11,10 @@ import org.easymock.EasyMockSupport;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.goodformentertainment.canary.frontier.Area;
 import com.goodformentertainment.canary.frontier.FrontierConfig;
 import com.goodformentertainment.canary.frontier.FrontierPlugin;
+import com.goodformentertainment.canary.frontier.Point;
 import com.goodformentertainment.canary.frontier.RegionUtil;
 
 public class FrontierManagerTest extends EasyMockSupport {
@@ -38,22 +36,22 @@ public class FrontierManagerTest extends EasyMockSupport {
 	
 	@Test
 	public void testGetBlockBounds() {
-		expect(mockConfig.getRegionBounds(mockWorld)).andReturn(new Rectangle(-1, -1, 2, 2));
+		expect(mockConfig.getRegionBounds(mockWorld)).andReturn(new Area(-1, -1, 1, 1));
 		
 		replayAll();
 		
-		assertEquals(new Rectangle(-512, -512, 1535, 1535), manager.getBlockBounds(mockWorld));
+		assertEquals(new Area(-512, -512, 1023, 1023), manager.getBlockBounds(mockWorld));
 		
 		verifyAll();
 	}
 	
 	@Test
 	public void testGetRegionBounds() {
-		expect(mockConfig.getRegionBounds(mockWorld)).andReturn(new Rectangle(-1, -1, 2, 2));
+		expect(mockConfig.getRegionBounds(mockWorld)).andReturn(new Area(-1, -1, 2, 2));
 		
 		replayAll();
 		
-		assertEquals(new Rectangle(-1, -1, 2, 2), manager.getRegionBounds(mockWorld));
+		assertEquals(new Area(-1, -1, 2, 2), manager.getRegionBounds(mockWorld));
 		
 		verifyAll();
 	}
@@ -62,7 +60,7 @@ public class FrontierManagerTest extends EasyMockSupport {
 	public void testInWilderness() {
 		expect(mockWorld.getType()).andReturn(DimensionType.NORMAL).anyTimes();
 		expect(mockWorld.getName()).andReturn("default").anyTimes();
-		expect(mockConfig.getRegionBounds(mockWorld)).andReturn(new Rectangle(-1, -1, 2, 2)).anyTimes();
+		expect(mockConfig.getRegionBounds(mockWorld)).andReturn(new Area(-1, -1, 1, 1)).anyTimes();
 		
 		replayAll();
 		
@@ -78,7 +76,7 @@ public class FrontierManagerTest extends EasyMockSupport {
 	
 	@Test
 	public void testSetRegionBounds() {
-		mockConfig.setRegionBounds(mockWorld, new Rectangle(-10, 5, 210, 45));
+		mockConfig.setRegionBounds(mockWorld, new Area(-10, 5, 200, 50));
 		
 		replayAll();
 		
@@ -94,17 +92,6 @@ public class FrontierManagerTest extends EasyMockSupport {
 		replayAll();
 		
 		manager.setBlockBounds(mockWorld, new Point(-513, -1), new Point(512, 50));
-		
-		verifyAll();
-	}
-	
-	@Test
-	public void test() {
-		mockConfig.setRegionBounds(mockWorld, -1, -1, 3, 4);
-		
-		replayAll();
-		
-		manager.setBlockBounds(mockWorld, new Point(-512, -512), new Point(2045, 2555));
 		
 		verifyAll();
 	}
@@ -134,5 +121,26 @@ public class FrontierManagerTest extends EasyMockSupport {
 		assertEquals(511, RegionUtil.fromRegionToBlock(0, false));
 		assertEquals(1023, RegionUtil.fromRegionToBlock(1, false));
 		assertEquals(1535, RegionUtil.fromRegionToBlock(2, false));
+	}
+	
+	@Test
+	public void test() {
+		final Area regionArea = new Area(-1, -1, 3, 4);
+		final Area blockArea = new Area(-512, -512, 2047, 2559);
+		
+		mockConfig.setRegionBounds(mockWorld, regionArea.min.x, regionArea.min.z, regionArea.max.x,
+				regionArea.max.z);
+		expect(mockConfig.getRegionBounds(mockWorld)).andReturn(regionArea);
+		
+		replayAll();
+		
+		final Area regionBounds = manager.setBlockBounds(mockWorld, new Point(-512, -512), new Point(
+				2045, 2555));
+		assertEquals(blockArea, regionBounds);
+		
+		final Area blockBounds = manager.getBlockBounds(mockWorld);
+		assertEquals(blockArea, blockBounds);
+		
+		verifyAll();
 	}
 }
