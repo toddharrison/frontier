@@ -27,7 +27,7 @@ public class FrontierCommand implements CommandListener {
 		if (caller instanceof Player) {
 			final Player player = caller.asPlayer();
 			player.message("Frontier");
-			player.message("Usage: /frontier <info | set | clear>");
+			player.message("Usage: /frontier <info | set | clear | reset>");
 		}
 	}
 	
@@ -80,7 +80,7 @@ public class FrontierCommand implements CommandListener {
 					
 					final int[] points = RegionUtil.rectangleToPoints(regionBounds);
 					
-					caller.asPlayer().message("Set the frontier to ");
+					player.message("Set the frontier to ");
 					player.message("Frontier: x = [" + points[0] + ", " + points[1] + "] and y = ["
 							+ points[2] + ", " + points[3] + "]");
 				} else {
@@ -102,10 +102,23 @@ public class FrontierCommand implements CommandListener {
 			final Player player = caller.asPlayer();
 			final World world = player.getWorld();
 			if (manager.clear(world)) {
-				caller.asPlayer().message("Removed the frontier from " + world.getName());
+				player.message("Removed the frontier from " + world.getName());
 			} else {
-				caller.asPlayer().message("No frontier exists in " + world.getName());
+				player.message("No frontier exists in " + world.getName());
 			}
+		}
+	}
+	
+	@Command(aliases = {
+		"reset"
+	}, parent = "frontier", description = "Reset the frontier", permissions = {
+		"frontier.command.reset"
+	}, toolTip = "/frontier reset")
+	public void reset(final MessageReceiver caller, final String[] parameters) {
+		if (caller instanceof Player) {
+			final Player player = caller.asPlayer();
+			manager.resetAllWildernesses();
+			player.message("Reset the frontier for all unloaded managed worlds");
 		}
 	}
 }
