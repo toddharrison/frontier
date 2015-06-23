@@ -1,4 +1,5 @@
-/bin/
-.gradle/
-build/
-
+.gradle
+build
+.idea
+frontier.iml
+gradle.properties
