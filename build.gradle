@@ -1,3 +1,5 @@
+// Set a property canaryHome pointing to the root of the canary test server
+
 apply plugin: 'java'
 apply plugin: 'eclipse'
 
