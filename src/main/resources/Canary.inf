@@ -1,5 +1,5 @@
 main-class=com.goodformentertainment.canary.frontier.FrontierPlugin
 author=Rusli
-version=1.0.0
+version=1.0.1
 name=Frontier
 enable-early=true
