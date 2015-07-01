@@ -2,6 +2,7 @@
 
 apply plugin: 'java'
 apply plugin: 'eclipse'
+apply plugin: 'maven'
 
 group = 'com.goodformentertainment.canary'
 version = '1.0.1'
@@ -21,13 +22,10 @@ jar {
 
 repositories {
     mavenCentral()
+    mavenLocal()
 
     maven {
         url 'http://repo.visualillusionsent.net/repository/public/'
-    }
-
-    maven {
-        url 'file:///Users/todd/.m2/repository'
     }
 }
 
